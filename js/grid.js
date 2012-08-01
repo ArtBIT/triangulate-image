@@ -1,3 +1,13 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Simple grid class, by Djordje Ungar
+//
+// This work is hereby released into the Public Domain. To view a copy of the public 
+// domain dedication, visit http://creativecommons.org/licenses/publicdomain/ or send 
+// a letter to Creative Commons, 171 Second Street, Suite 300, San Francisco, 
+// California, 94105, USA.
+//
+////////////////////////////////////////////////////////////////////////////////
 (function(window) {
 
 	function Grid(width, height, cols, rows) {

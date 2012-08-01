@@ -1,3 +1,13 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Pixel data analizer class, by Djordje Ungar
+//
+// This work is hereby released into the Public Domain. To view a copy of the public 
+// domain dedication, visit http://creativecommons.org/licenses/publicdomain/ or send 
+// a letter to Creative Commons, 171 Second Street, Suite 300, San Francisco, 
+// California, 94105, USA.
+//
+////////////////////////////////////////////////////////////////////////////////
 (function($, window) {
     var colorDistance = function(c1, c2) {
         return (Math.abs(c1[0] - c2[0]) + Math.abs(c1[1] - c2[1]) + Math.abs(c1[2] - c2[2]) + Math.abs(c1[3] - c2[3])) / 1024
