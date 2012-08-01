@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script type='text/javascript' src='http://ajax.googleapis.com/ajax/libs/jquery/1.6.3/jquery.min.js'></script>
+    <script type='text/javascript' src="js/grid.js"></script>
+    <script type='text/javascript' src="js/pixelnetwork.js"></script>
+    <script type='text/javascript' src="js/triangulation.js"></script>
+
+    <link type='text/css' rel='stylesheet' media='Screen,Projection,TV' href='css/layout.css' />
+    <link type='text/css' rel='stylesheet' media='Screen,Projection,TV' href='css/style.css' />
+  </head>
+  <body>
+    <div id="super_wrapper">
+        <div id="header_wrapper">
+            Image Triangulation
+        </div>
+        <div id="content_wrapper">
+            <div id="content">
+                <div class="wide bubble with-shadow auto-height">
+                    <div class="pp">
+                            <div id="controls" class="c">
+                                <div class="pp">
+                                    <div class="ff">
+                                        <div class="button fl">
+                                            <input type="file" class="pick-file" multiple="false">
+                                            <span>Add A File</span>
+                                        </div>
+                                        <div class="button process-image fl">
+                                            <span>Process Image</span>
+                                        </div>
+                                        <div class="button reset-image fl">
+                                            <span>Reset Image</span>
+                                        </div>
+                                        <div class="button pixel-distance fl">
+                                            <span style="display:inline-block; vertical-align:middle">Pixel Distance:</span>
+                                            <span style="display:inline-block; vertical-align:middle;width:100px; height: 32px;">
+                                                <input id="pixel_distance" style="width:80px;margin-top:6px" type="range" class="range" min="5" max="100" value="20"/>
+                                            </span>
+                                        </div>
+                                        <div class="button pixel-distance fl">
+                                            <span style="display:inline-block; vertical-align:middle">Color Distance:</span>
+                                            <span style="display:inline-block; vertical-align:middle;width:100px; height: 32px;">
+                                                <input id="contrast_distance" style="width:80px;margin-top:6px" type="range" class="range" min="10" max="250" value="50"/>
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="pp">
+                                <img id="screen" width="550"/>
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+    jQuery(function(){
+        /**
+         * Helper functions
+         */
+        function getPixel(pixelData, x, y) {
+            var pixels = pixelData.data;
+            var i = (y * pixelData.width + x) << 2;
+            return [pixels[i + 0], pixels[i + 1], pixels[i + 2], pixels[i + 3]]
+        }
+        function arrayToRgba(c) {
+            return "rgba(" + c.join() + ")";
+        }
+
+        /**
+         * TriangulismApp 
+         */
+        function TriangulismApp(options) {
+            this.image_loaded = false;
+        }
+        TriangulismApp.prototype.init = function($img) {
+            this.canvas = document.createElement('canvas');
+            var w = $img.width();
+            var h = $img.height();
+            this.canvas.width = w;
+            this.canvas.height = h;
+            this.ctx = this.canvas.getContext('2d');
+            this.ctx.drawImage($img.get(0), 0, 0, w, h);
+            this.original_image_data  = this.ctx.getImageData(0, 0, w, h);
+            this.processed_image_data = this.ctx.getImageData(0, 0, w, h);
+            this.busy = false;
+        }
+        TriangulismApp.prototype.fileSelected = function(myFiles) {
+            for (var i = 0, f; f = myFiles[i]; i++) {
+                var imageReader = new FileReader();
+                imageReader.onload = (function(context, file) {
+                    return function(e) {
+                        $('#screen').attr('src', e.target.result).parent().show();
+                        context.image_loaded = true;
+                    }
+                })(this, f);
+                imageReader.readAsDataURL(f);
+            }
+        }
+        TriangulismApp.prototype.fileDrop = function(e) {
+            fileSelected(e.dataTransfer.files);
+            e.stopPropagation();
+            e.preventDefault();
+        }
+        TriangulismApp.prototype.resetImage = function() {
+            if (this.busy || !this.image_loaded) return;
+            this.ctx.putImageData(this.original_image_data, 0, 0);
+            $('#screen').attr('src', this.canvas.toDataURL()).show();
+        }
+        TriangulismApp.prototype.processImage = function() {
+            if (this.busy ||  !this.image_loaded) return;
+            this.busy = true;
+            var $img = $('#screen');
+            this.init($img);
+            var options = {};
+            options.pixelDistance = parseInt($('#pixel_distance').val(), 10);
+            options.contrastDistance = parseInt($('#contrast_distance').val(),10) / 1000;
+
+            var pixelNetwork = new PixelNetwork(this.processed_image_data);
+            pixelNetwork.process(options);
+            pixelNetwork.reduce();
+            this.render(pixelNetwork.getPoints());
+            $img.attr('src', this.canvas.toDataURL()).show();
+            this.busy = false;
+        }
+        TriangulismApp.prototype.render = function(points) {
+            var triangles = Triangulate(points);
+            for (var i in triangles) {
+                var triangle = triangles[i];
+
+                this.ctx.beginPath();
+
+                this.ctx.moveTo(triangle.v0.x, triangle.v0.y);
+                this.ctx.lineTo(triangle.v1.x, triangle.v1.y);
+                this.ctx.lineTo(triangle.v2.x, triangle.v2.y);
+
+                this.ctx.closePath();
+
+                var triangle_center = {
+                    x: ((triangle.v0.x + triangle.v1.x + triangle.v2.x) / 3) | 0,
+                    y: ((triangle.v0.y + triangle.v1.y + triangle.v2.y) / 3) | 0
+                };
+                var rgba = arrayToRgba(getPixel(this.original_image_data, triangle_center.x, triangle_center.y));
+                this.ctx.strokeStyle = rgba;
+                this.ctx.fillStyle = rgba;
+                this.ctx.fill();
+                this.ctx.stroke();
+
+            }
+
+        }
+
+        var app = new TriangulismApp();
+        jQuery('.hidden').hide().removeClass('hidden');
+        jQuery('.button input.pick-file').change(function(e){
+            app.fileSelected.call(app, this.files);
+        });
+        jQuery('.button.process-image').click(function(e){
+            app.processImage.call(app);
+        });
+        jQuery('.button.reset-image').click(function(e){
+            app.resetImage.call(app);
+        });
+    });
+    </script>
+  </body>
+</html>

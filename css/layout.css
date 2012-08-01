@@ -1,0 +1,46 @@
+/* Basic, Centered, 100% wide vertically fluid layout */
+
+html, body 
+{
+    height: 100%;
+    width:  100%;
+    font: 10pt Verdana, sans-serif;
+}
+
+* {
+    margin: 0px;
+    padding: 0px;
+}
+
+div#super_wrapper, div#header_wrapper, div#footer_wrapper {
+    width: 100%;
+    text-align: center;
+}
+
+div#super_wrapper {
+    position: relative;
+    text-align: center;
+    min-height: 100%;
+    height: auto;
+    _height: 100%;
+}
+/* Hack for IE */ * html #super_wrapper {height: 100%; } /* End IE Hack */
+
+div#content_wrapper {
+    margin: 0 auto;
+    /* IE fix */ text-align: center;
+    width: 100%;
+    height: auto;
+    min-height: 300px;
+}
+/* Hack for IE */ * html #content_wrapper {height: 500px; } /* End IE Hack */
+
+div#footer_wrapper {
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+}
+div#header_wrapper {
+}
+
+
