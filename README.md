@@ -5,7 +5,7 @@ Image Triangulation
 Simple Web App that tries to turn an image into a triangulated mosaic. Check [this link](http://artbit.deviantart.com/gallery/38261066) for example results.
 
 # Demo
-[Click Here](artbit.github.io/triangulate-image/index.html) to see a live demo.
+[Click Here](http://artbit.github.io/triangulate-image/index.html) to see a live demo.
 
 # Example Usage
 
