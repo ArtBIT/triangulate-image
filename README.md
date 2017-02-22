@@ -1,6 +1,6 @@
 Image Triangulation
 ===================
-![Triangulation example](https://github.com/ArtBIT/triangulate-image/blob/master/images/example.png?raw=true)
+![Triangulation example](images/example.png?raw=true)
 
 Simple Web App that tries to turn an image into a triangulated mosaic. Check [this link](http://artbit.deviantart.com/gallery/38261066) for example results.
 
