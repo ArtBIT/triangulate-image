@@ -1,6 +1,6 @@
 Image Triangulation
 ===================
-![Super Mario Sky](http://github.com/ArtBIT/triangulate-image/raw/master/images/example.png)
+![Triangulation example](https://github.com/ArtBIT/triangulate-image/blob/master/images/example.png?raw=true)
 
 Simple Web App that tries to turn an image into a triangulated mosaic. Check [this link](http://artbit.deviantart.com/gallery/38261066) for example results.
 
